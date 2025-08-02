@@ -2,30 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Corbado Passkey Demo</title>
-  <!-- ✅ Load Corbado SDK from official CDN -->
-  <script src="https://cdn.corbado.com/js/authn/1.0.0/authn.js"></script>
+  <title>Corbado Passkey Auth Demo</title>
+
+  <!-- ✅ Correct Corbado SDK -->
+  <script src="https://js.corbado.com/1.0.0/authn.min.js"></script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f7f7f7;
+    }
+    input, button {
+      padding: 10px;
+      margin: 8px 0;
+      font-size: 16px;
+    }
+    button {
+      cursor: pointer;
+    }
+    pre {
+      background: #222;
+      color: #0f0;
+      padding: 15px;
+      font-size: 14px;
+      white-space: pre-wrap;
+      max-width: 100%;
+    }
+  </style>
 </head>
 <body>
   <h1>🔐 Corbado Passkey Demo</h1>
 
   <input type="text" id="username" placeholder="Enter username" />
-  <button onclick="registerPasskey()">Register Passkey</button>
-  <button onclick="loginPasskey()">Login with Passkey</button>
+  <br />
+  <button onclick="registerPasskey()">🔐 Register Passkey</button>
+  <button onclick="loginPasskey()">✅ Login with Passkey</button>
 
-  <pre id="output">Output will appear here...</pre>
+  <pre id="output">Waiting...</pre>
 
   <script>
-    // ✅ Initialize Corbado SDK
+    // ✅ Initialize Corbado SDK with your Project ID
     Corbado.init({
       frontendApi: "pro-3857098473696981499"
     });
 
+    // ✅ Your working backend (Render-hosted)
     const backendBase = "https://backend-c2pv.onrender.com";
 
     async function registerPasskey() {
       const username = document.getElementById("username").value.trim();
-      if (!username) return alert("Username is required");
+      if (!username) return alert("⚠️ Please enter a username.");
 
       try {
         const challengeRes = await fetch(`${backendBase}/register-challenge`, {
@@ -47,13 +74,13 @@
         document.getElementById("output").textContent = "✅ Registered:\n" + JSON.stringify(result, null, 2);
       } catch (err) {
         console.error(err);
-        document.getElementById("output").textContent = "❌ Error:\n" + (err.message || err);
+        document.getElementById("output").textContent = "❌ Registration failed:\n" + (err.message || err);
       }
     }
 
     async function loginPasskey() {
       const username = document.getElementById("username").value.trim();
-      if (!username) return alert("Username is required");
+      if (!username) return alert("⚠️ Please enter a username.");
 
       try {
         const challengeRes = await fetch(`${backendBase}/login-challenge`, {
@@ -75,7 +102,7 @@
         document.getElementById("output").textContent = "✅ Logged in:\n" + JSON.stringify(result, null, 2);
       } catch (err) {
         console.error(err);
-        document.getElementById("output").textContent = "❌ Error:\n" + (err.message || err);
+        document.getElementById("output").textContent = "❌ Login failed:\n" + (err.message || err);
       }
     }
   </script>
