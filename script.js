@@ -3,7 +3,7 @@ import {
   startAuthentication
 } from 'https://cdn.jsdelivr.net/npm/@simplewebauthn/browser/+esm';
 
-const BACKEND_URL = 'https://your-backend.onrender.com'; // 👈 Replace this
+const BACKEND_URL = 'https://myfirstrepo-ga0q.onrender.com'; // 👈 Replace this
 
 const log = (msg) => {
   const el = document.createElement('li');
