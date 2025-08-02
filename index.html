@@ -1,17 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Passkey Login App</title>
-  <script src="https://cdn.jsdelivr.net/npm/@corbado/webcomponent@latest/dist/corbado-webcomponent.js"></script>
+  <meta charset="UTF‑8" />
+  <title>Corbado Passkey Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font‑family: sans‑serif; max‑width: 400px; margin: auto; padding: 20px; }
+    button { display: block; width: 100%; margin: 10px 0; padding: 1em; font-size: 1.1em; }
+    pre { background: #f5f5f5; padding: 10px; }
+  </style>
 </head>
 <body>
-  <h1>🔐 Welcome to Passkey Auth</h1>
+  <h1>Corbado Passkey Auth Demo</h1>
 
-  <!-- Login/Register component powered by Corbado -->
-  <corbado-auth project-id="pro-3857098473696981499"></corbado-auth>
+  <div id="authArea">
+    <!-- Corbado UI will render here -->
+    <div id="corbado-auth"></div>
+    <div id="logoutArea" style="display:none;">
+      <button id="logoutBtn">Logout</button>
+    </div>
+    <button id="whoamiBtn" style="display:none;">Who Am I?</button>
+    <pre id="userInfo"></pre>
+  </div>
 
-  <!-- JavaScript to handle login success -->
-  <script src="main.js"></script>
+  <!-- Corbado WebJS script & styles from npm `@corbado/web‑js` CDN -->
+  <link rel="stylesheet"
+    href="https://unpkg.com/@corbado/web-js@latest/dist/bundle/index.css">
+  <script src="https://unpkg.com/@corbado/web-js@latest/dist/bundle/index.js"></script>
+
+  <script type="module">
+    const projectId = 'pro-3857098473696981499';
+    await Corbado.load({
+      projectId,
+      frontendApi: 'https://pro-3857098473696981499.frontendapi.cloud.corbado.io',
+      darkMode: 'auto',
+      isDevMode: true
+    });
+
+    const authContainer = document.getElementById('corbado-auth');
+    Corbado.mountAuthUI(authContainer, {
+      onLoggedIn: () => {
+        document.getElementById('logoutArea').style.display = 'block';
+        document.getElementById('whoamiBtn').style.display = 'block';
+      }
+    });
+
+    document.getElementById('logoutBtn').onclick = async () => {
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.reload();
+    };
+
+    document.getElementById('whoamiBtn').onclick = async () => {
+      const res = await fetch('/api/user');
+      if (res.ok) {
+        document.getElementById('userInfo').textContent =
+          JSON.stringify(await res.json(), null, 2);
+      } else {
+        alert('Not authenticated');
+        window.location.reload();
+      }
+    };
+  </script>
 </body>
 </html>
