@@ -3,52 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <title>Corbado Passkey Demo</title>
-  <!-- Load Corbado Authn SDK -->
-  <script src="https://pro-3857098473696981499.frontendapi.cloud.corbado.io/authn.js"></script>
-  <style>
-    body {
-      font-family: sans-serif;
-      max-width: 500px;
-      margin: 50px auto;
-      padding: 1rem;
-      background: #f9f9f9;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
-    input, button {
-      padding: 0.5rem;
-      margin-top: 10px;
-      font-size: 16px;
-      width: 100%;
-    }
-    button {
-      cursor: pointer;
-      background: #0070f3;
-      color: white;
-      border: none;
-      border-radius: 6px;
-    }
-    pre {
-      background: #e6e6e6;
-      padding: 1rem;
-      margin-top: 20px;
-      border-radius: 8px;
-      white-space: pre-wrap;
-    }
-  </style>
+  <!-- ✅ Load Corbado SDK from official CDN -->
+  <script src="https://cdn.corbado.com/js/authn/1.0.0/authn.js"></script>
 </head>
 <body>
   <h1>🔐 Corbado Passkey Demo</h1>
 
-  <input type="text" id="username" placeholder="Enter username (e.g. atsh)" />
-
+  <input type="text" id="username" placeholder="Enter username" />
   <button onclick="registerPasskey()">Register Passkey</button>
   <button onclick="loginPasskey()">Login with Passkey</button>
 
   <pre id="output">Output will appear here...</pre>
 
   <script>
-    // ✅ Point to your Render backend URL
+    // ✅ Initialize Corbado SDK
+    Corbado.init({
+      frontendApi: "pro-3857098473696981499"
+    });
+
     const backendBase = "https://backend-c2pv.onrender.com";
 
     async function registerPasskey() {
@@ -56,7 +28,6 @@
       if (!username) return alert("Username is required");
 
       try {
-        // 1. Get registration challenge
         const challengeRes = await fetch(`${backendBase}/register-challenge`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -64,10 +35,8 @@
         });
         const challenge = await challengeRes.json();
 
-        // 2. Perform WebAuthn registration
         const credential = await Corbado.passkey.register(challenge);
 
-        // 3. Send credential to server
         const registerRes = await fetch(`${backendBase}/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -75,10 +44,10 @@
         });
 
         const result = await registerRes.json();
-        document.getElementById("output").textContent = "✅ Registration Successful:\n" + JSON.stringify(result, null, 2);
+        document.getElementById("output").textContent = "✅ Registered:\n" + JSON.stringify(result, null, 2);
       } catch (err) {
         console.error(err);
-        document.getElementById("output").textContent = "❌ Error:\n" + err;
+        document.getElementById("output").textContent = "❌ Error:\n" + (err.message || err);
       }
     }
 
@@ -87,7 +56,6 @@
       if (!username) return alert("Username is required");
 
       try {
-        // 1. Get login challenge
         const challengeRes = await fetch(`${backendBase}/login-challenge`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -95,10 +63,8 @@
         });
         const challenge = await challengeRes.json();
 
-        // 2. Perform WebAuthn login
         const assertion = await Corbado.passkey.login(challenge);
 
-        // 3. Send assertion to server
         const loginRes = await fetch(`${backendBase}/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -106,10 +72,10 @@
         });
 
         const result = await loginRes.json();
-        document.getElementById("output").textContent = "✅ Login Successful:\n" + JSON.stringify(result, null, 2);
+        document.getElementById("output").textContent = "✅ Logged in:\n" + JSON.stringify(result, null, 2);
       } catch (err) {
         console.error(err);
-        document.getElementById("output").textContent = "❌ Error:\n" + err;
+        document.getElementById("output").textContent = "❌ Error:\n" + (err.message || err);
       }
     }
   </script>
