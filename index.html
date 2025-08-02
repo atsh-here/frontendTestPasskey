@@ -1,122 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Corbado Passkey Demo</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Passkey WebAuthn Demo</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="app.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 Passkey Authentication</h1>
 
-    <!-- Official Corbado frontend SDK and styles -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/@corbado/web-js@2/dist/bundle/index.css"
-    />
-    <script src="https://unpkg.com/@corbado/web-js@2/dist/bundle/index.js"></script>
-  </head>
-
-  <body style="font-family:sans-serif;max-width:500px;margin:2rem auto;">
-    <h1>🔐 Corbado Passkey Demo</h1>
-    <div>
-      <input
-        id="username"
-        type="text"
-        placeholder="Enter username"
-        style="font-size:16px;padding:.5rem;width:100%"
-      />
+    <div class="card">
+      <h2>1️⃣ Create User Account</h2>
+      <form id="register-form">
+        <label for="reg-username">Username</label>
+        <input type="text" id="reg-username" required />
+        <label for="reg-password">Password</label>
+        <input type="password" id="reg-password" required />
+        <button type="submit">Register</button>
+      </form>
     </div>
 
-    <div style="margin-top:1rem;">
-      <button
-        onclick="registerPasskey()"
-        style="padding:.6rem;font-size:16px;cursor:pointer;width:48%;margin-right:4%"
-      >Register</button>
-      <button
-        onclick="loginPasskey()"
-        style="padding:.6rem;font-size:16px;cursor:pointer;width:48%"
-      >Login</button>
+    <div class="card">
+      <h2>2️⃣ Register a Passkey</h2>
+      <form id="register-passkey-form">
+        <label for="passkey-username">Username</label>
+        <input type="text" id="passkey-username" required />
+        <button type="submit">Register Passkey</button>
+      </form>
     </div>
 
-    <pre id="output" style="margin-top:2rem;background:#f3f3f3;padding:1rem;border-radius:6px;"></pre>
+    <div class="card">
+      <h2>3️⃣ Login with Passkey</h2>
+      <form id="login-passkey-form">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" required />
+        <button type="submit">Login</button>
+      </form>
+    </div>
 
-    <script type="module">
-      // ⚙️ Initialize the Corbado SDK
-      await Corbado.load({
-        projectId: "pro-3857098473696981499",
-      });
-
-      const out = message => (document.getElementById("output").textContent = message);
-
-      const backend = "https://backend-c2pv.onrender.com";
-
-      async function registerPasskey() {
-        const username = document.getElementById("username").value.trim();
-        if (!username) {
-          alert("Username required");
-          return;
-        }
-
-        try {
-          const res1 = await fetch(
-            `${backend}/register-challenge`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ username })
-            }
-          );
-          const challenge = await res1.json();
-
-          const credential = await Corbado.passkey.register(challenge);
-
-          const res2 = await fetch(
-            `${backend}/register`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(credential)
-            }
-          );
-          const result = await res2.json();
-          out("✅ Registered:\n" + JSON.stringify(result, null, 2));
-        } catch (err) {
-          console.error(err);
-          out("❌ Error:\n" + (err.message || err));
-        }
-      }
-
-      async function loginPasskey() {
-        const username = document.getElementById("username").value.trim();
-        if (!username) {
-          alert("Username required");
-          return;
-        }
-
-        try {
-          const res1 = await fetch(
-            `${backend}/login-challenge`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ username })
-            }
-          );
-          const challenge = await res1.json();
-
-          const assertion = await Corbado.passkey.login(challenge);
-
-          const res2 = await fetch(
-            `${backend}/login`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(assertion)
-            }
-          );
-          const result = await res2.json();
-          out("✅ Logged in:\n" + JSON.stringify(result, null, 2));
-        } catch (err) {
-          console.error(err);
-          out("❌ Error:\n" + (err.message || err));
-        }
-      }
-    </script>
-  </body>
+    <div class="log-area">
+      <h3>Messages</h3>
+      <ul id="messages"></ul>
+    </div>
+  </div>
+</body>
 </html>
