@@ -3,66 +3,114 @@
 <head>
   <meta charset="UTF-8" />
   <title>Corbado Passkey Demo</title>
+  <!-- Load Corbado Authn SDK -->
   <script src="https://pro-3857098473696981499.frontendapi.cloud.corbado.io/authn.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 1rem;
+      background: #f9f9f9;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    input, button {
+      padding: 0.5rem;
+      margin-top: 10px;
+      font-size: 16px;
+      width: 100%;
+    }
+    button {
+      cursor: pointer;
+      background: #0070f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+    }
+    pre {
+      background: #e6e6e6;
+      padding: 1rem;
+      margin-top: 20px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
 <body>
   <h1>🔐 Corbado Passkey Demo</h1>
-  <input type="text" id="username" placeholder="Enter username" />
 
-  <br><br>
+  <input type="text" id="username" placeholder="Enter username (e.g. atsh)" />
 
   <button onclick="registerPasskey()">Register Passkey</button>
   <button onclick="loginPasskey()">Login with Passkey</button>
 
-  <pre id="output"></pre>
+  <pre id="output">Output will appear here...</pre>
 
   <script>
-    const backendBase = "https://backendapi.cloud.corbado.io"; // Replace if self-hosted
+    // ✅ Point to your Render backend URL
+    const backendBase = "https://backend-c2pv.onrender.com";
 
     async function registerPasskey() {
-      const username = document.getElementById("username").value;
-      if (!username) return alert("Username required");
+      const username = document.getElementById("username").value.trim();
+      if (!username) return alert("Username is required");
 
-      const challengeRes = await fetch("http://localhost:5000/register-challenge", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
-      });
-      const challenge = await challengeRes.json();
+      try {
+        // 1. Get registration challenge
+        const challengeRes = await fetch(`${backendBase}/register-challenge`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username }),
+        });
+        const challenge = await challengeRes.json();
 
-      const credential = await Corbado.passkey.register(challenge);
+        // 2. Perform WebAuthn registration
+        const credential = await Corbado.passkey.register(challenge);
 
-      const registerRes = await fetch("http://localhost:5000/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(credential),
-      });
+        // 3. Send credential to server
+        const registerRes = await fetch(`${backendBase}/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(credential),
+        });
 
-      const result = await registerRes.json();
-      document.getElementById("output").textContent = JSON.stringify(result, null, 2);
+        const result = await registerRes.json();
+        document.getElementById("output").textContent = "✅ Registration Successful:\n" + JSON.stringify(result, null, 2);
+      } catch (err) {
+        console.error(err);
+        document.getElementById("output").textContent = "❌ Error:\n" + err;
+      }
     }
 
     async function loginPasskey() {
-      const username = document.getElementById("username").value;
-      if (!username) return alert("Username required");
+      const username = document.getElementById("username").value.trim();
+      if (!username) return alert("Username is required");
 
-      const challengeRes = await fetch("http://localhost:5000/login-challenge", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
-      });
-      const challenge = await challengeRes.json();
+      try {
+        // 1. Get login challenge
+        const challengeRes = await fetch(`${backendBase}/login-challenge`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username }),
+        });
+        const challenge = await challengeRes.json();
 
-      const assertion = await Corbado.passkey.login(challenge);
+        // 2. Perform WebAuthn login
+        const assertion = await Corbado.passkey.login(challenge);
 
-      const loginRes = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(assertion),
-      });
+        // 3. Send assertion to server
+        const loginRes = await fetch(`${backendBase}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(assertion),
+        });
 
-      const result = await loginRes.json();
-      document.getElementById("output").textContent = JSON.stringify(result, null, 2);
+        const result = await loginRes.json();
+        document.getElementById("output").textContent = "✅ Login Successful:\n" + JSON.stringify(result, null, 2);
+      } catch (err) {
+        console.error(err);
+        document.getElementById("output").textContent = "❌ Error:\n" + err;
+      }
     }
   </script>
 </body>
