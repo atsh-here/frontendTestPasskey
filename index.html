@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Passkey WebAuthn Demo</title>
+  <title>Hanko Passkey Authentication Demo</title>
   <link rel="stylesheet" href="style.css" />
   <script type="module" src="app.js" defer></script>
 </head>
 <body>
   <div class="container">
-    <h1>🔐 Passkey Authentication</h1>
+    <h1>🔐 Hanko Passkey Authentication</h1>
 
     <div class="card">
       <h2>1️⃣ Create User Account</h2>
       <form id="register-form">
-        <label for="reg-username">Username</label>
-        <input type="text" id="reg-username" required />
-        <label for="reg-password">Password</label>
-        <input type="password" id="reg-password" required />
+        <label for="reg-username">Email</label>
+        <input type="email" id="reg-username" required />
+        <label for="reg-password">Password (Optional - for fallback)</label>
+        <input type="password" id="reg-password" />
         <button type="submit">Register</button>
       </form>
     </div>
@@ -25,8 +25,8 @@
     <div class="card">
       <h2>2️⃣ Register a Passkey</h2>
       <form id="register-passkey-form">
-        <label for="passkey-username">Username</label>
-        <input type="text" id="passkey-username" required />
+        <label for="passkey-username">Email</label>
+        <input type="email" id="passkey-username" required />
         <button type="submit">Register Passkey</button>
       </form>
     </div>
@@ -34,8 +34,8 @@
     <div class="card">
       <h2>3️⃣ Login with Passkey</h2>
       <form id="login-passkey-form">
-        <label for="login-username">Username</label>
-        <input type="text" id="login-username" required />
+        <label for="login-username">Email</label>
+        <input type="email" id="login-username" required />
         <button type="submit">Login</button>
       </form>
     </div>
